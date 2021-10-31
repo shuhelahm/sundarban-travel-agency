@@ -12,7 +12,6 @@ app.use(cors());
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.oesrn.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
-console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 async function run() {
     try {
@@ -27,6 +26,12 @@ async function run() {
         const cursor = servicesCollection.find({});
         const services = await cursor.toArray();
         res.send(services);
+      })
+
+      app.get('/orders', async(req, res)=>{
+        const cursor = orderCollection.find({});
+        const order = await cursor.toArray();
+        res.send(order);
       })
 
       app.get('/services/:id', async(req, res)=>{
@@ -46,9 +51,10 @@ async function run() {
 
       // add orders api
       api.post('/orders', async(req,res)=>{
-        const order = req.body;
+        const newOrder = req.body;
+        const result = await orderCollection.insertOne(newOrder);
         console.log('order', order)
-        res.send('order processed')
+        res.json(result)
       })
     } finally {
       // await client.close();
