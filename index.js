@@ -4,7 +4,7 @@ const { MongoClient } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
 require('dotenv').config();
 const cors = require('cors');
-const { query } = require('express');
+const { query, application } = require('express');
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -19,6 +19,7 @@ async function run() {
       await client.connect();
       const database = client.db("sundarban-travel-agency");
       const servicesCollection = database.collection("services");
+      const orderCollection = database.collection('orders');
       console.log('database connected')
 
       // get api
@@ -41,6 +42,13 @@ async function run() {
           console.log('hit the post', req.body)
           const result = await servicesCollection.insertOne(newUser);
           res.json(result);
+      })
+
+      // add orders api
+      api.post('/orders', async(req,res)=>{
+        const order = req.body;
+        console.log('order', order)
+        res.send('order processed')
       })
     } finally {
       // await client.close();
